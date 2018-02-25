@@ -3,6 +3,7 @@ package com.ytel.timaclientdemo
 import com.ytel.miefus.{MiefusApplication, TimaUserCacheConnection}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
 import scala.util.Success
 /**
   * Start writing your message handler..
@@ -25,7 +26,9 @@ object TimaCaccheTest {
     case _ => println("No User found")
   }
 
-  def runLoad = for(i <- 1 to 1000) sids.foreach(TimaUserCacheConnection.getUser(_).onComplete(println))
+  def runLoad = for(i <- 1 to 1000) sids.foreach(x =>
+    blocking {TimaUserCacheConnection.getUser(x).onComplete(println)}
+  )
 
   val sids = List("4f8ee738-cd8d-6df7-ea5b-198ba11de4d7",
     "f7510c90-2a60-c5bd-4b9d-af70ba5380a7",
@@ -71,8 +74,8 @@ object TimaCaccheTest {
   def repeatingTests: Unit = {
     runSingle
     runLoad
-    repeatingTests
     Thread.sleep(3000)
+    repeatingTests
   }
 }
 
